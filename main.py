@@ -187,7 +187,43 @@ def delete_todolist(id: int, task: task):
         return res
     except Exception as e:
         return e
+    
+    
+# chatroom
+@app.get('/get.chatroom')
+def get_chatroom():
+    try:
+        
+        res = query.get(f"SELECT room_id , room_name , room_desc FROM chatroom WHERE del_frag = 'N'")
+        return {"data" : res}
+    except Exception as e:
+        return e
+    
 
+class msg (BaseModel) :
+    username:str
+    msg: str
+    room_id : int    
+@app.post('/post.msg')
+def post_chatroom(data : msg):
+    time = service.time()
+    
+    try:
+        
+        res = query.post(f"INSERT INTO chatroom_room (msg_username , msg_msg ,create_date,room_id) VALUES ('{data.username}' , '{data.msg}' , '{time}',{data.room_id}) ")
+        return {"data" : res}
+    except Exception as e:
+        return e
+    
+@app.get('/get.chats/roomid={id}')
+def get_chatroom(id :int):
+
+    try:
+        
+        res = query.get(f"SELECT msg_username , msg_msg , create_date FROM chatroom_room WHERE del_frag = 'N' AND room_id = {id}")
+        return {"data" : res}
+    except Exception as e:
+        return e
 
 # @app.get('/test')
 # def test():
