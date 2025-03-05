@@ -37,7 +37,7 @@ def get_DB():
     connector = mysql.connector.connect(
         host='localhost',
         user='root',
-        database='games_news'
+        database='miniproject'
     )
 
     return connector
@@ -78,11 +78,11 @@ class query():
         # cursor.close()
         # cnx.close()
 #
-        # cnx.commit()
-        # id = cursor.lastrowid
-        # cursor.close()
-        # cnx.close()
-        # return {"message": 200, "ID": id}
+        cnx.commit()
+        id = cursor.lastrowid
+        cursor.close()
+        cnx.close()
+        return {"message": 200, "ID": id}
 
     def put(order: String):
         cnx = get_DB()
@@ -94,3 +94,102 @@ class query():
 
         return {"status": 200, "msg": 'update has change'}
 
+# service
+
+
+class Services:
+    def time(self):
+        # Get current date and time
+        current_day_time = datetime.now()
+        formatted_time = current_day_time.strftime('%Y-%m-%d %H:%M:%S')
+        return formatted_time
+
+
+# Create an instance of Services
+service = Services()
+# app
+
+
+class task (BaseModel):
+    name: str
+    desc: str
+
+
+@app.post('/post.todolist')
+def post_todotask(task: task):
+    time = service.time()
+    try:
+        res = query.post(
+            f"INSERT INTO todolist (task_name, task_desc,create_date) VALUES ('{task.name}', '{task.desc}' ,'{time}')")
+
+        return {'msg': res}
+    except Exception as e:
+        return e
+
+
+@app.get('/get.todolist')
+def get_todotask():
+
+    try:
+        # res = query.post(f"SELECT task_name , task_desc FROM todolist WHERE del_frag ='N' AND succ_frag = 'N'")
+
+        res = query.get(
+            f"SELECT task_id,task_name, task_desc FROM todolist WHERE del_frag = 'N' AND succ_frag = 'N'")
+
+        return {'data': res}
+    except Exception as e:
+        return e
+
+
+@app.get('/get.succ_todolist')
+def get_todotask():
+
+    try:
+        # res = query.post(f"SELECT task_name , task_desc FROM todolist WHERE del_frag ='N' AND succ_frag = 'N'")
+
+        res = query.get(
+            f"SELECT task_name, task_desc , succ_date FROM todolist WHERE del_frag = 'N' AND succ_frag = 'Y' ")
+
+        return {'data': res}
+    except Exception as e:
+        return e
+
+
+@app.put('/delete.todolist/{id}')
+def delete_todolist(id: int):
+    try:
+        res = query.put(
+            f"UPDATE todolist SET del_frag = 'Y' WHERE task_id = {id}")
+
+        return res
+    except Exception as e:
+        return e
+
+
+@app.put('/success.todolist/{id}')
+def delete_todolist(id: int):
+    time = service.time()
+    try:
+        res = query.put(
+            f"UPDATE todolist SET succ_frag = 'Y' , succ_date = '{time}' WHERE task_id = {id}")
+
+        return res
+    except Exception as e:
+        return e
+
+
+@app.put('/edit.todolist/{id}')
+def delete_todolist(id: int, task: task):
+    try:
+        res = query.put(
+            f"UPDATE todolist SET task_name = '{task.name}' , task_desc = '{task.desc}' WHERE task_id = {id}")
+
+        return res
+    except Exception as e:
+        return e
+
+
+# @app.get('/test')
+# def test():
+#     res = service.time()
+#     return res
