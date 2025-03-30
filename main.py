@@ -26,19 +26,17 @@ load_dotenv()
 
 # get DB
 def get_DB():
-    # deploy docker
-    # connector = mysql.connector.connect(
-    #     host='host.docker.internal',
-    #     user='root',
-    #     database='mydb'
-    # )
-
-    # localhost
     connector = mysql.connector.connect(
-        host='localhost',
+        host='host.docker.internal',
         user='root',
         database='miniproject'
     )
+
+    # connector = mysql.connector.connect(
+    #     host='localhost',
+    #     user='root',
+    #     database='miniproject'
+    # )
 
     return connector
 
